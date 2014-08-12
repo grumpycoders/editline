@@ -25,6 +25,33 @@
 
 #include "editline.h"
 
+#ifndef CRLF
+#define CRLF "\r\n"
+#endif
+
+#ifdef _MSC_VER
+#ifdef _WIN64
+typedef __int64    ssize_t;
+#else  /* _WIN64 */
+typedef _W64 int   ssize_t;
+#endif  /* _WIN64 */
+#endif
+
+#ifdef _WIN32
+#include <io.h>
+typedef unsigned short pid_t;
+static int kill(pid_t pid, int sig) { return 0; }
+static pid_t getpid(void) { return 0; }
+#endif
+
+#ifndef SIGQUIT
+#define SIGQUIT 3
+#endif
+
+#ifndef SIGTSTP
+#define SIGTSTP 20
+#endif
+
 /*
 **  Manifest constants.
 */
@@ -97,8 +124,8 @@ static int        el_pushed;
 static int        el_intr_pending;
 static int        el_infd  = EL_STDIN;
 static int        el_outfd = EL_STDOUT;
-static el_keymap_t Map[];
-static el_keymap_t MetaMap[];
+extern el_keymap_t Map[];
+extern el_keymap_t MetaMap[];
 static size_t     Length;
 static size_t     ScreenCount;
 static size_t     ScreenSize;
